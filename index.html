@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>Jumble</title>
+    <meta name="description" content="A user-friendly Nostr client for exploring relay feeds">
+    <meta name="keywords" content="jumble, nostr, web, client, relay, feed, social, pwa, simple, clean">
+
+    <meta name="apple-mobile-web-app-title" content="Jumble">
+    <link rel="icon" href="/favicon.ico" sizes="48x48">
+    <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml">
+    <meta name="theme-color" content="#171717" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+
+    <meta property="og:url" content="https://jumble.social">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Jumble">
+    <meta property="og:description" content="A user-friendly Nostr client for exploring relay feeds">
+    <meta property="og:image" content="https://github.com/CodyTseng/jumble/blob/master/resources/og-image.png?raw=true">
+  <style type="text/tailwindcss">/* fs:/projects/jumblednn/src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  * {
+    @apply border-border;
+    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html {
+    @apply font-sans antialiased;
+    --bc-color-brand: hsl(var(--primary));
+    --bc-color-brand-dark: hsl(var(--primary));
+    --bc-brand-mix: 100%;
+    --bc-color-brand-button-text: hsl(var(--primary-foreground));
+    --bc-color-brand-button-text-dark: hsl(var(--primary-foreground));
+  }
+  input,
+  textarea,
+  button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-overflow-scrolling: touch;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    user-select: none;
+  }
+  body,
+  html {
+    overscroll-behavior-y: none;
+  }
+  .clickable {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    &:active {
+      background-color: hsl(var(--muted) / 0.3);
+    }
+  }
+  .tiptap p.is-editor-empty:first-child::before {
+    color: hsl(var(--muted-foreground));
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .clickable:hover {
+      background-color: hsl(var(--muted) / 0.3);
+    }
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: 400% 0;
+    }
+    100% {
+      background-position: 0% 0;
+    }
+  }
+  .animate-shimmer {
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  :root {
+    --surface-background: 0 0% 98%;
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 259 43% 56%;
+    --primary-hover: 259 43% 65%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 94%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 94%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 94%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 259 43% 56%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --surface-background: 240 10% 3.9%;
+    --background: 0 0% 9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 259 43% 56%;
+    --primary-hover: 259 43% 65%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 259 43% 56%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+  .dark.pure-black {
+    --surface-background: 0 0% 0%;
+    --background: 0 0% 0%;
+    --card: 0 0% 0%;
+    --popover: 0 0% 0%;
+  }
+  .dark input[type=datetime-local]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.5);
+  }
+}
+@keyframes progressFill {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+@keyframes shake {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  10% {
+    transform: translate(-1px, -1px) rotate(-1deg);
+  }
+  20% {
+    transform: translate(1px, -1px) rotate(1deg);
+  }
+  30% {
+    transform: translate(-1px, 1px) rotate(-1deg);
+  }
+  40% {
+    transform: translate(1px, 1px) rotate(1deg);
+  }
+  50% {
+    transform: translate(-1px, -1px) rotate(-1deg);
+  }
+  60% {
+    transform: translate(1px, -1px) rotate(1deg);
+  }
+  70% {
+    transform: translate(-1px, 1px) rotate(-1deg);
+  }
+  80% {
+    transform: translate(1px, 1px) rotate(1deg);
+  }
+  90% {
+    transform: translate(-1px, -1px) rotate(-1deg);
+  }
+}
+
+/* esm:https://esm.sh/*yet-another-react-lightbox@3.21.7/styles.css?target=esnext&lp=node_modules%252Fyet-another-react-lightbox */
+.yarl__fullsize {
+  height: 100%;
+  width: 100%;
+}
+.yarl__relative {
+  position: relative;
+}
+.yarl__portal {
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  overflow: hidden;
+  position: fixed;
+  right: 0;
+  top: 0;
+  transition: opacity var(--yarl__fade_animation_duration,.25s) var(--yarl__fade_animation_timing_function,ease);
+  z-index: var(--yarl__portal_zindex,9999);
+}
+.yarl__portal_open {
+  opacity: 1;
+}
+.yarl__container {
+  background-color: var(--yarl__container_background_color,var(--yarl__color_backdrop,#000));
+  bottom: 0;
+  left: 0;
+  outline: none;
+  overflow: hidden;
+  overscroll-behavior: var(--yarl__controller_overscroll_behavior,contain);
+  position: absolute;
+  right: 0;
+  top: 0;
+  touch-action: var(--yarl__controller_touch_action,none);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+.yarl__carousel {
+  align-content: center;
+  align-items: stretch;
+  display: flex;
+  flex: 0 0 auto;
+  height: 100%;
+  justify-content: center;
+  opacity: var(--yarl__pull_opacity,1);
+  transform: translate(var(--yarl__swipe_offset,0), var(--yarl__pull_offset,0));
+  width: calc(100% + (var(--yarl__carousel_slides_count) - 1)*(100% + var(--yarl__carousel_spacing_px, 0)*1px + var(--yarl__carousel_spacing_percent, 0)*1%));
+}
+.yarl__carousel_with_slides {
+  -moz-column-gap: calc(var(--yarl__carousel_spacing_px, 0)*1px + 100/(var(--yarl__carousel_slides_count)*100 + (var(--yarl__carousel_slides_count) - 1)*var(--yarl__carousel_spacing_percent, 0))*var(--yarl__carousel_spacing_percent, 0)*1%);
+  column-gap: calc(var(--yarl__carousel_spacing_px, 0)*1px + 100/(var(--yarl__carousel_slides_count)*100 + (var(--yarl__carousel_slides_count) - 1)*var(--yarl__carousel_spacing_percent, 0))*var(--yarl__carousel_spacing_percent, 0)*1%);
+}
+.yarl__flex_center {
+  align-content: center;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+.yarl__slide {
+  flex: 1;
+  overflow: hidden;
+  padding: calc(var(--yarl__carousel_padding_px, 0)*1px + 100/(var(--yarl__carousel_slides_count)*100 + (var(--yarl__carousel_slides_count) - 1)*var(--yarl__carousel_spacing_percent, 0))*var(--yarl__carousel_padding_percent, 0)*1%);
+  position: relative;
+}
+[dir=rtl] .yarl__slide {
+  --yarl__direction:-1;
+}
+.yarl__slide_image {
+  max-height: 100%;
+  max-width: 100%;
+  -o-object-fit: contain;
+  object-fit: contain;
+  touch-action: var(--yarl__controller_touch_action,none);
+  -moz-user-select: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.yarl__slide_image_cover {
+  height: 100%;
+  -o-object-fit: cover;
+  object-fit: cover;
+  width: 100%;
+}
+.yarl__slide_image_loading {
+  opacity: 0;
+}
+@media screen and (min-width:800px) {
+  .yarl__slide_wrapper:not(.yarl__slide_wrapper_interactive) .yarl__slide_image {
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateZ(0);
+    -webkit-transform-style: preserve-3d;
+  }
+}
+.yarl__slide_placeholder {
+  left: 50%;
+  line-height: 0;
+  position: absolute;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+.yarl__slide_loading {
+  animation: yarl__delayed_fadein 1s linear;
+  color: var(--yarl__slide_icon_loading_color,var(--yarl__color_button,hsla(0,0%,100%,.8)));
+}
+.yarl__slide_loading line {
+  animation: yarl__stroke_opacity 1s linear infinite;
+}
+.yarl__slide_loading line:first-of-type {
+  animation-delay: -1.875s;
+}
+.yarl__slide_loading line:nth-of-type(2) {
+  animation-delay: -1.75s;
+}
+.yarl__slide_loading line:nth-of-type(3) {
+  animation-delay: -1.625s;
+}
+.yarl__slide_loading line:nth-of-type(4) {
+  animation-delay: -1.5s;
+}
+.yarl__slide_loading line:nth-of-type(5) {
+  animation-delay: -1.375s;
+}
+.yarl__slide_loading line:nth-of-type(6) {
+  animation-delay: -1.25s;
+}
+.yarl__slide_loading line:nth-of-type(7) {
+  animation-delay: -1.125s;
+}
+.yarl__slide_loading line:nth-of-type(8) {
+  animation-delay: -1s;
+}
+.yarl__slide_error {
+  color: var(--yarl__slide_icon_error_color,red);
+  height: var(--yarl__slide_icon_error_size,48px);
+  width: var(--yarl__slide_icon_error_size,48px);
+}
+@media (prefers-reduced-motion) {
+  .yarl__portal,
+  .yarl__slide {
+    transition: unset;
+  }
+  .yarl__slide_loading,
+  .yarl__slide_loading line {
+    animation: unset;
+  }
+}
+.yarl__toolbar {
+  bottom: auto;
+  display: flex;
+  justify-content: flex-end;
+  left: auto;
+  padding: var(--yarl__toolbar_padding,8px);
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+[dir=rtl] .yarl__toolbar {
+  bottom: auto;
+  left: 0;
+  right: auto;
+  top: 0;
+}
+.yarl__icon {
+  height: var(--yarl__icon_size,32px);
+  width: var(--yarl__icon_size,32px);
+}
+.yarl__button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: var(--yarl__button_background_color,transparent);
+  border: var(--yarl__button_border,0);
+  color: var(--yarl__color_button,hsla(0,0%,100%,.8));
+  cursor: pointer;
+  filter: var(--yarl__button_filter,drop-shadow(2px 2px 2px rgba(0,0,0,.8)));
+  line-height: 0;
+  margin: var(--yarl__button_margin,0);
+  outline: none;
+  padding: var(--yarl__button_padding,8px);
+  -webkit-tap-highlight-color: transparent;
+}
+.yarl__button:focus {
+  color: var(--yarl__color_button_active,#fff);
+}
+.yarl__button:focus:not(:focus-visible) {
+  color: var(--yarl__color_button,hsla(0,0%,100%,.8));
+}
+.yarl__button:focus-visible {
+  color: var(--yarl__color_button_active,#fff);
+}
+@media (hover:hover) {
+  .yarl__button:focus-visible:hover,
+  .yarl__button:focus:hover,
+  .yarl__button:hover {
+    color: var(--yarl__color_button_active,#fff);
+  }
+}
+.yarl__button:disabled {
+  color: var(--yarl__color_button_disabled,hsla(0,0%,100%,.4));
+  cursor: default;
+}
+.yarl__navigation_next,
+.yarl__navigation_prev {
+  padding: var(--yarl__navigation_button_padding,24px 16px);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.yarl__navigation_prev {
+  left: 0;
+}
+[dir=rtl] .yarl__navigation_prev {
+  left: unset;
+  right: 0;
+  transform: translateY(-50%) rotate(180deg);
+}
+.yarl__navigation_next {
+  right: 0;
+}
+[dir=rtl] .yarl__navigation_next {
+  left: 0;
+  right: unset;
+  transform: translateY(-50%) rotate(180deg);
+}
+.yarl__no_scroll {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+@keyframes yarl__delayed_fadein {
+  0% {
+    opacity: 0;
+  }
+  80% {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes yarl__stroke_opacity {
+  0% {
+    stroke-opacity: 1;
+  }
+  to {
+    stroke-opacity: .125;
+  }
+}
+/*# sourceMappingURL=main-CVRKHIUM.css.map */
+</style><script type="module" src="/shakespeare_tailwind.config-LQZUVOLP.js"></script></head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/main-ACU3635J.js"></script>
+  
+
+</body></html>
